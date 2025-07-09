@@ -1,0 +1,51 @@
+{
+  // ─── Python Interpreter & Environment ───────────────────────────────────────
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": false,
+
+  // ─── Linting & Formatting ─────────────────────────────────────────────────
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "ms-python.black-formatter",
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "isort.args": ["--profile", "black"],
+
+  // Optional: Ruff linting instead of pylint
+  // Requires "charliermarsh.ruff" extension; disable other linters
+  "python.linting.enabled": false,
+  "python.linting.ruffEnabled": true,
+  "python.linting.flake8Enabled": false,
+  "python.linting.pylintEnabled": false,
+
+  // ─── Code Analysis & Autocomplete ─────────────────────────────────────────
+  "python.analysis.extraPaths": ["./src"],
+  "python.autoComplete.extraPaths": ["./src"],
+  "python.analysis.typeCheckingMode": "basic",  // or "strict"
+
+  // ─── Testing (pytest) ───────────────────────────────────────────────────────
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+
+  // ─── Terminal & Shell Integration ─────────────────────────────────────────
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.profiles.osx": {
+    "zsh": {
+      "path": "zsh",
+      "args": ["-l"]
+    }
+  },
+  "terminal.integrated.shellIntegration.enabled": false,
+
+  // ─── Optional: Editor Polish ───────────────────────────────────────────────
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.rulers": [79, 119],  // PEP 8 line length + wrap margin
+  "editor.tabSize": 4
+}
