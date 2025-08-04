@@ -52,6 +52,24 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
             }
+        },
+        {
+            "name": "Python Debugger: LangGraph",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/langgraph",
+            "args": [
+                "dev",
+                "--allow-blocking",
+                "--wait-for-client"
+            ],
+            "cwd": "${workspaceFolder}",
+            "jinja": true,
+            "justMyCode": true,
+            "stopOnEntry": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            }
         }
     ]
 }

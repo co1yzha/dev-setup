@@ -1,0 +1,47 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: "Python project structure and size guidelines"
+alwaysApply: true
+---
+
+# 📏 Python Script Length & Structure Guidelines
+
+## 🔢 Script Length
+- Keep each `.py` script no more than **400 lines**.
+  - ✅ Prefer ≤ **200 lines** for readability and maintainability.
+  - 📌 Allow up to **300 lines** only if the module is logically cohesive.
+
+## 🧩 Code Structure
+- Use **functions** to organise logic. Avoid long, linear scripts.
+- Include a `main()` entry point for scriptable modules.
+- Use **British spell** for coding
+
+
+## 🚫 Avoid Anti-Patterns
+- Avoid unstructured code blocks with no clear decomposition.
+- Don’t let business logic sprawl in the global scope.
+
+## 🧱 Object-Oriented Development
+- **Use OOP only when necessary and benefits for practice**, such as for:
+  - AI agents
+  - Reusable frameworks or stateful components
+- Otherwise, prefer functional style and procedural scripting.
+
+## ✅ Examples
+
+### ✅ Structured and Modular
+```python
+def process():
+    ...
+
+def main():
+    data = load()
+    cleaned = clean(data)
+    ...
+
+if __name__ == "__main__":
+    main()
