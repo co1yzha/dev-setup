@@ -10,6 +10,23 @@ alwaysApply: true
 
 # 📏 Python Script Length & Structure Guidelines
 
+## 🧰 Runtime & Tooling Baseline
+- **Python**: 3.13 (target runtime)
+- **Project manager**: `uv` (single source of truth is `pyproject.toml`, versions pinned via `uv.lock`)
+- **Web framework**: FastAPI `0.121.1` (pin this version for new services)
+
+### 🚀 uv quickstart
+```bash
+# Ensure Python 3.13 is available (managed by uv)
+uv python install 3.13
+
+# Create/refresh virtual env and install deps
+uv sync
+
+# Add a dependency (example)
+uv add fastapi==0.121.1
+```
+
 ## 🔢 Script Length
 - Keep each `.py` script no more than **400 lines**.
   - ✅ Prefer ≤ **200 lines** for readability and maintainability.

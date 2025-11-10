@@ -27,7 +27,7 @@ Test uv on your own, but for production, we stay with the classic approach until
   - [4. CI/CD \& Docker Integration](#4-cicd--docker-integration)
     - [A. GitHub Actions (Sample)](#a-github-actions-sample)
     - [B. Dockerfile Example](#b-dockerfile-example)
-  - [5. Example Workflow](#5-example-workflow)
+  - [5. Quick Help](#5-quick-help)
   - [7.  Further Reading \& Resources](#7--further-reading--resources)
 
 ---
@@ -230,25 +230,42 @@ CMD ["uv", "run", "python", "main.py"]
 
 
 
-## 5. Example Workflow
+## 5. Quick Help
 
-- New Project
     ```
-    uv init myproject
+    # Ensure uv is installed
+    brew install uv
+    uv --bersion
+    uv self update
+
+    # Pick your Python and create a local venv
     cd myproject
-    uv python pin 3.12
+    uv init
+    uv python insall 3.1x
+    uv python pin 3.1x
+    uv venv
+
+    # Install from requirements.txt
+    uv add -r requirements.txt        # adds to [project.dependencies] if requirements.txt exist
+    # For dev-only items, use:
+    # uv add -r requirements-dev.txt -D
+
+    # Resolve and install
+    uv lock                            # creates/updates uv.lock
+    uv sync                            # installs into .venv based on lock
+
+    # Add new package
     uv add fastapi uvicorn --dev pytest
     uv run pytest
     uv remove pytest
+
+    # Run
+    uv run python main.py
+
     uv build
     # In VS Code, select the .venv interpreter and go!
     ```
 
-- For existing projects:
-  ```
-  uv pip install -r requirements.txt
-  ```
-  Then switch to uv add/remove, uv lock, and uv sync for future work.
 
 ---
 

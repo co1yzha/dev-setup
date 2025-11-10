@@ -1,3 +1,19 @@
+## Recommended FastAPI project structure (pragmatic, AI-friendly)
+
+Use this as a simple, scalable baseline. Prefer co-locating feature code; keep endpoints thin; avoid over‑engineering.
+
+### Table of contents
+- Project tree (canonical)
+- Notes (naming, endpoints, configuration, testing)
+- Minimal router example
+- Wire routers in the app
+- Dependency injection guidance
+- Services pattern
+- Full main.py example (canonical)
+- Module-level models and schemas (co‑located option)
+- Alternative main.py variant (user snippet)
+
+### Project tree (canonical)
 ```
 <project-name>/
 │
@@ -137,7 +153,7 @@ def double(x: int, svc: ExampleService = Depends(get_example_service)) -> dict:
 - Linting: `ruff`; Types: `mypy`; Tests: `pytest`
 - Keep it boring; prefer consistency over complexity.
 
-### Full `main.py` example (CORS, logging, lifespan, env-based run)
+### Full `main.py` example (canonical: CORS, logging, lifespan, env-based run)
 ```python
 # app/main.py
 import logging
@@ -240,4 +256,143 @@ if __name__ == "__main__":
             log_level="debug",
             workers=1,
         )
+```
+
+### Module-level models and schemas (co‑located option)
+If your features are clearly bounded (e.g. "module1", "module2"), co‑locating their models/schemas with services keeps changes local and imports clearer.
+
+```
+app/
+  api/
+    v1/
+      endpoints/
+        module1_router.py
+        module2_router.py
+  module1/
+    __init__.py
+    models/            # SQLAlchemy/ODM models specific to module1
+    schemas/           # Pydantic request/response models for module1
+    services/
+      __init__.py
+      service.py
+    repos.py
+  module2/
+    __init__.py
+    models/
+    schemas/
+    services/
+      __init__.py
+      service.py
+  models/              # Shared, cross-module DB models (optional)
+  schemas/             # Shared, cross-module schemas (optional)
+```
+
+- **When to colocate**: Most models are only used by one feature. Keep them under that feature.
+- **When to centralise**: A model or schema is shared by multiple features or external packages.
+
+Example endpoint importing co‑located types/services:
+```python
+# app/api/v1/endpoints/module1_router.py
+from fastapi import APIRouter, Depends
+from ...module1.schemas.request import CreateItemRequest  # e.g. under module1/schemas/request.py
+from ...module1.schemas.response import ItemResponse
+from ...module1.services.service import Module1Service
+
+router = APIRouter(tags=["module1"])
+
+def get_service() -> Module1Service:
+    return Module1Service()
+
+@router.post("/module1/items", response_model=ItemResponse)
+def create_item(payload: CreateItemRequest, svc: Module1Service = Depends(get_service)) -> ItemResponse:
+    return svc.create_item(payload)
+### Alternative `main.py` variant (user snippet)
+```python
+from routes.database_routes import database_router
+from routes.search_routes import search_router
+from database import connect_to_mongo, close_mongo_connection
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import ssl
+from dotenv import load_dotenv
+from contextlib import asynccontextmanager
+import logging
+import os
+
+# Configure logging
+logging.basicConfig(
+    filename='app.log',  # Log file name
+    level=logging.DEBUG,  # Log level
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'  # Log format
+)
+
+logger = logging.getLogger(__name__)
+load_dotenv()
+
+
+# %% ----------------TAG CONFIG ----------------
+ssl._create_default_https_context = ssl._create_unverified_context
+
+description = """
+The Eurovision song contest analysis project is a comprehensive analysis of the Eurovision song contest, including data retrieval, processing, and analysis.
+"""
+
+tags_metadata = [
+    {
+        "name": "Database",
+        "description": "Database connection endpoints",
+    },
+    {
+        "name": "Trending",
+        "description": "Trending insight endpoints",
+    },
+    {
+        "name": "Community",
+        "description": "Community search endpoints",
+    },
+]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await connect_to_mongo()
+    yield
+    await close_mongo_connection()
+
+app = FastAPI(
+    title="Multimodal Analytics: Eurovision Song contest",
+    description=description,
+    version='0.0.1',
+    lifespan=lifespan,
+)
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Specify needed methods
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+
+
+@app.get("/")
+def index():
+    return {"message": "fastapi MMA backend server is running."}
+
+app.include_router(database_router, tags=["Database"])
+app.include_router(search_router, tags=["Search"])
+app.include_router(explore_router, tags=["Explore"])
+
+# %% ----------------RUN SERVER ----------------
+if __name__ == "__main__":
+    env = os.getenv("ENV", "development")
+    if env == "production":
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, workers=2)
+    else:
+        uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True, log_level="debug", workers=1)
 ```
