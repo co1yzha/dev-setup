@@ -33,6 +33,7 @@ uv add fastapi==0.121.1
   - 📌 Allow up to **300 lines** only if the module is logically cohesive.
 
 ## 🧩 Code Structure
+- DO NOT OVERENGINEERING the scripts or structure.
 - Use **functions** to organise logic. Avoid long, linear scripts.
 - Include a `main()` entry point for scriptable modules.
 - Use **British spell** for coding
