@@ -175,7 +175,9 @@ if __name__ == "__main__":
 #### app/api/router.py
 ```python
 from fastapi import APIRouter
-from app.api.v1.endpoints import health, inference_router, rag_router
+from app.api.v1.endpoints.health import router as health_router
+from app.api.v1.endpoints.inference import router as inference_router
+from app.api.v1.endpoints.rag import router as rag_router
 
 tags_metadata = [
     {"name": "health", "description": "Health and readiness probes."},
@@ -184,9 +186,9 @@ tags_metadata = [
 ]
 
 router = APIRouter(prefix="/api/v1")
-router.include_router(health.router, tags=["health"])
-router.include_router(inference_router.router, tags=["inference"])
-router.include_router(rag_router.router, tags=["rag"])
+router.include_router(health_router, tags=["health"])
+router.include_router(inference_router, tags=["inference"])
+router.include_router(rag_router, tags=["rag"])
 ```
 
 ---
