@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: "Python project structure and size guidelines"
@@ -15,20 +15,9 @@ alwaysApply: true
 - **Project manager**: `uv` (single source of truth is `pyproject.toml`, versions pinned via `uv.lock`)
 - **Web framework**: FastAPI `0.121.1` (pin this version for new services)
 
-### 🚀 uv quickstart
-```bash
-# Ensure Python 3.13 is available (managed by uv)
-uv python install 3.13
-
-# Create/refresh virtual env and install deps
-uv sync
-
-# Add a dependency (example)
-uv add fastapi==0.121.1
-```
 
 ## 🔢 Script Length
-- Keep each `.py` script no more than **400 lines**.
+- Keep each `.py` script no more than **300 lines**.
   - ✅ Prefer ≤ **200 lines** for readability and maintainability.
   - 📌 Allow up to **300 lines** only if the module is logically cohesive.
 
