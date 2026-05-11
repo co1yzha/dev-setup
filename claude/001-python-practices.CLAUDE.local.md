@@ -1,46 +1,43 @@
-# Python project structure and size guidelines
+# Python practices
 
-# 📏 Python Script Length & Structure Guidelines
+## Commands
+- Install deps: `uv sync`
+- Run tests: `uv run pytest`
+- Lint: `uv run ruff check .`
+- Format: `uv run ruff format .`
+- Type-check: `uv run mypy .`
 
-## 🧰 Runtime & Tooling Baseline
-- **Python**: 3.13 (target runtime)
-- **Project manager**: `uv` (single source of truth is `pyproject.toml`, versions pinned via `uv.lock`)
-- **Web framework**: FastAPI `0.121.1` (pin this version for new services)
+## Runtime & tooling
+- Python 3.13.
+- Project manager: `uv` — `pyproject.toml` is the single source of truth, versions pinned via `uv.lock`.
+- Web framework: FastAPI `0.121.1` (verify against latest stable before adopting in a new project).
+- British spelling in code, comments, and identifiers (`colour`, `organise`, `behaviour`).
 
+## Architecture
+- Prefer functional and procedural style. Reach for OOP only when it earns its keep — AI agents, reusable frameworks, genuinely stateful components.
+- Organise logic into named functions. Avoid long linear scripts and business logic in the global scope.
+- Scriptable modules include a `main()` entry point guarded by `if __name__ == "__main__"`.
 
-## 🔢 Script Length
-- Keep each `.py` script no more than **300 lines**.
-  - ✅ Prefer ≤ **200 lines** for readability and maintainability.
-  - 📌 Allow up to **300 lines** only if the module is logically cohesive.
+## File size
+- Target ≤ 200 lines per `.py` file.
+- 300 lines is the hard ceiling, and only when the module is logically cohesive.
+- Split by responsibility, not by line count alone.
 
-## 🧩 Code Structure
-- DO NOT OVERENGINEERING the scripts or structure.
-- Use **functions** to organise logic. Avoid long, linear scripts.
-- Include a `main()` entry point for scriptable modules.
-- Use **British spell** for coding
+## Avoid
+- Over-engineering. Don't reach for classes, decorators, or abstractions before they pay for themselves.
+- Unstructured blocks with no clear decomposition.
+- Module-level globals holding business state.
 
-
-## 🚫 Avoid Anti-Patterns
-- Avoid unstructured code blocks with no clear decomposition.
-- Don't let business logic sprawl in the global scope.
-
-## 🧱 Object-Oriented Development
-- **Use OOP only when necessary and benefits for practice**, such as for:
-  - AI agents
-  - Reusable frameworks or stateful components
-- Otherwise, prefer functional style and procedural scripting.
-
-## ✅ Examples
-
-### ✅ Structured and Modular
+## Example structure
 ```python
-def process():
-    ...
+def load(): ...
+def clean(data): ...
+def process(data): ...
 
-def main():
+def main() -> None:
     data = load()
     cleaned = clean(data)
-    ...
+    process(cleaned)
 
 if __name__ == "__main__":
     main()

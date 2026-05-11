@@ -1,67 +1,75 @@
-# Practical Next.js coding rules for performance, readability, and maintainability
+# Next.js practices
 
-Applies to:
-- `src/**/*.{ts,tsx,js,jsx}`
-- `app/**/*.{ts,tsx,js,jsx}`
-- `pages/**/*.{ts,tsx,js,jsx}`
-- `components/**/*.{ts,tsx,js,jsx}`
-- `lib/**/*.{ts,tsx,js,jsx}`
+Applies to TypeScript/JavaScript files under `src/`, `app/`, `pages/`, `components/`, `lib/`.
 
-0. British Spelling
+## Commands
+- Install: `pnpm install`
+- Dev server: `pnpm dev`
+- Build: `pnpm build`
+- Test: `pnpm test`
+- Lint: `pnpm lint`
+- Type-check: `pnpm typecheck`
 
-# Structure & size
-1. Keep each file under **350 lines**; extract UI and hooks to reusable components in `components/` and `lib/`.
-2. Prefer **TypeScript** (`.ts/.tsx`) and strict mode; add types instead of `any`. Put shared types in `types/`.
-3. Co-locate by feature: `app/(feature)/components`, `app/(feature)/[route]`, `lib/(feature)/*`.
-4. Use **barrel files** (`index.ts`) only when they don't bloat the client bundle.
+## Conventions
+- British spelling in code, comments, and identifiers (`colour`, `organise`, `behaviour`).
+- TypeScript strict mode. No `any` — use `unknown` and narrow, or write the proper type. Shared types live in `types/`.
+- Absolute imports via the `@/` alias. Group and sort imports. No circular deps.
 
-# React / Next.js best practices
-5. Default to **Server Components**; add `"use client"` only for browser APIs/event handlers/local state.
-6. For Client Components, minimise re-renders: lift state, split components, and memoise **sparingly** (`React.memo`, `useMemo`, `useCallback`) on hot paths.
-7. Use **Server Actions** or **Route Handlers** for mutations. Validate with **Zod** on the server.
-8. Follow App Router conventions: `loading.tsx` (Suspense), `error.tsx` (error boundary), `not-found.tsx` (404).
-9. Use `next/link` + `next/navigation`; avoid `window.location` in client code.
+## Architecture
+- Default to **Server Components**. Add `"use client"` only for browser APIs, event handlers, or local state.
+- Mutations go through **Server Actions** or **Route Handlers**. Validate input with **Zod** on the server.
+- App Router conventions: `loading.tsx` for Suspense, `error.tsx` for error boundaries, `not-found.tsx` for 404.
+- Co-locate by feature: `app/(feature)/components`, `app/(feature)/[route]`, `lib/(feature)/*`.
+- Use `next/link` and `next/navigation`. Avoid `window.location` in client code.
 
-# Data fetching & caching
-10. Prefer server `fetch` with explicit caching:
-    - Static: `fetch(url, { cache: 'force-cache' })`
-    - Revalidate: `fetch(url, { next: { revalidate: 60 } })`
-    - Dynamic: `fetch(url, { cache: 'no-store' })`
-11. Invalidate with `revalidateTag` / `revalidatePath` after mutations.
-12. For client queries, use **SWR** or **TanStack Query**; don't duplicate server + client fetch for the same data.
+## File size & structure
+- Target < 350 lines per file. Extract reusable UI to `components/`, hooks and helpers to `lib/`.
+- Barrel files (`index.ts`) only where they don't bloat the client bundle.
 
-# Performance
-13. Use **`next/image`** with width/height; set `priority` only for above-the-fold images.
-14. Use **`next/font`** over custom `<link>` for fonts.
-15. **Dynamic import** heavy client-only modules: `dynamic(() => import('...'), { ssr: false })` when needed.
-16. Keep bundles lean: tree-shake, prefer native APIs, avoid large utility libs. Check bundle analysis.
-17. Debounce/throttle expensive handlers; prefer CSS for animations; use `requestAnimationFrame` for smooth loops.
+## Data fetching
+- Server `fetch` with an explicit cache mode:
+  - Static: `{ cache: 'force-cache' }`
+  - Revalidating: `{ next: { revalidate: 60 } }`
+  - Dynamic: `{ cache: 'no-store' }`
+- After mutations: `revalidateTag` or `revalidatePath`.
+- Client-side queries use **TanStack Query** or **SWR**. Don't duplicate the same request server- and client-side.
 
-# Styling & theming (MUI-friendly)
-18. Keep a single **ThemeProvider**; don't hardcode colours—use theme tokens.
-19. Extract repeated UI into **reusable components** (forms/cards/dialogs). Keep prop APIs small and typed.
-20. Support **dark mode** and check contrast.
+## Performance
+- `next/image` with explicit width and height. `priority` only for above-the-fold images.
+- `next/font` over `<link>` tags.
+- `dynamic(() => import('...'), { ssr: false })` for heavy client-only modules.
+- Memoise (`React.memo`, `useMemo`, `useCallback`) only when a profiler confirms re-renders are the bottleneck. Not preemptively.
+- Debounce or throttle expensive handlers. Prefer CSS for animations; `requestAnimationFrame` for JS-driven loops.
+- Run bundle analysis before merging anything that adds dependencies. Flag any single client chunk over 200KB gzipped.
 
-# API & security
-21. Never expose secrets to the client. Read `process.env.*` only on the server.
-22. Validate inputs with **Zod**; sanitise HTML before rendering (e.g., `rehype-sanitize`).
-23. Add security headers (CSP, Referrer-Policy) via middleware in production.
+## Styling
+- Single `ThemeProvider`. Reference theme tokens, never hardcode colours.
+- Extract repeated UI (forms, cards, dialogs) into typed components with small prop APIs.
+- Support dark mode. Check contrast at AA minimum.
 
-# Accessibility & UX
-24. Use semantic HTML; ARIA only when needed. All interactive elements must be keyboard-reachable with visible focus.
-25. Icon-only buttons need `aria-label`; inputs need labels and clear error text.
+## Security
+- Secrets stay on the server. `process.env.*` is only read in server code.
+- Validate all external input with Zod.
+- Sanitise rendered HTML (`rehype-sanitize` or equivalent).
+- CSP and Referrer-Policy headers via middleware in production.
 
-# Testing & quality
-26. Test critical logic (Vitest/Jest) and key flows (Playwright). Test behaviour, not implementation.
-27. Enforce ESLint + Prettier. Avoid `eslint-disable`—if needed, justify with a comment.
-28. Import hygiene: absolute imports via `@/` alias; group/sort imports; avoid circular deps.
+## Accessibility
+- Semantic HTML first; ARIA only where semantics fall short.
+- Every interactive element keyboard-reachable with a visible focus ring.
+- Icon-only buttons need `aria-label`. Inputs need labels and clear error text.
 
-# Logging & errors
-29. Use `console` for dev only. On server, use a tiny logger (timestamps/levels). Log errors with context, never PII.
-30. Surface errors via `error.tsx` and user toasts/snackbars for client actions.
+## Testing
+- Vitest or Jest for unit and critical logic. Playwright for key user flows.
+- Test behaviour, not implementation details.
 
-# Documentation
-31. Add short JSDoc for complex components and props. Add a README in feature folders when non-obvious.
+## Logging & errors
+- `console` is for development only. Server-side: a structured logger (e.g. **pino**) with timestamps and levels.
+- Log errors with context. Never log PII or secrets.
+- Surface errors via `error.tsx` (server boundary) and toasts/snackbars (client actions).
 
-# When in doubt
-32. Optimise for **clarity first**, then performance. Small, well-named components beat clever one-liners.
+## Documentation
+- Short JSDoc on complex components and non-obvious props.
+- A README in a feature folder when the layout isn't self-explanatory.
+
+## When in doubt
+Clarity first, performance second. Small, well-named components beat clever one-liners.
